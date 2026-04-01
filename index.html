@@ -107,6 +107,19 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg
 .grade{font-size:1.05rem;font-weight:700;margin-top:.4rem}
 footer{text-align:center;padding:1.2rem;color:var(--gray);font-size:.75rem}
 .hidden{display:none!important}
+
+/* ===== CONTENT TILES ===== */
+.tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:1rem}
+.tile{background:#fff;border-radius:14px;box-shadow:0 3px 14px rgba(0,0,0,.08);padding:1.8rem 1.2rem;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;border-top:5px solid var(--blue)}
+.tile:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.14)}
+.tile.tile-video{border-top-color:var(--orange)}
+.tile.tile-podcast{border-top-color:var(--green)}
+.tile.tile-quiz{border-top-color:var(--blue)}
+.tile-icon{font-size:2.8rem;margin-bottom:.6rem}
+.tile-label{font-weight:700;font-size:1.05rem;color:var(--darkblue)}
+.tile-sub{font-size:.82rem;color:var(--gray);margin-top:.2rem}
+.content-back{display:inline-flex;align-items:center;gap:.4rem;color:var(--blue);font-weight:600;font-size:.9rem;cursor:pointer;margin-bottom:1rem;padding:.4rem 0;border:none;background:none;text-decoration:none}
+.content-back:hover{text-decoration:underline}
 @media(max-width:600px){.tag-grid{grid-template-columns:1fr}.app-header h1{font-size:1rem}.login-box{padding:1.5rem}}
 </style>
 </head>
@@ -243,10 +256,13 @@ function renderDashboard() {
 }
 
 /* ========== TAG VIEW ========== */
+var currentTagId = "";
+
 function openTag(id) {
   var tag = null;
   for (var i = 0; i < tags.length; i++) { if (tags[i].id === id) { tag = tags[i]; break; } }
   if (!tag) return;
+  currentTagId = id;
 
   document.getElementById("dashboardScreen").classList.add("hidden");
   document.getElementById("tagViewScreen").classList.remove("hidden");
@@ -254,49 +270,88 @@ function openTag(id) {
   document.getElementById("tagViewHeading").textContent = tag.num + " \u2013 " + tag.topic;
   document.getElementById("tagViewSub").textContent = tag.date;
 
+  showTagTiles(tag);
+}
+
+function showTagTiles(tag) {
   var content = document.getElementById("tagContent");
-  var html = "";
-
-  /* Video */
+  var html = '<div class="tile-grid">';
   if (tag.video) {
-    html += '<div class="section-title">Video</div>';
-    html += '<div class="media-card"><video controls preload="metadata"><source src="media/' + id + '/video.mp4" type="video/mp4">Dein Browser unterst\u00FCtzt kein Video.</video></div>';
+    html += '<div class="tile tile-video" onclick="showVideo(\'' + tag.id + '\')">';
+    html += '<div class="tile-icon">&#127909;</div>';
+    html += '<div class="tile-label">Video</div>';
+    html += '<div class="tile-sub">Unterrichtsvideo ansehen</div></div>';
   }
-
-  /* Podcast */
   if (tag.podcast) {
-    html += '<div class="section-title">Podcast</div>';
-    html += '<div class="media-card"><audio controls preload="metadata"><source src="media/' + id + '/podcast.m4a" type="audio/mp4">Dein Browser unterst\u00FCtzt kein Audio.</audio></div>';
+    html += '<div class="tile tile-podcast" onclick="showPodcast(\'' + tag.id + '\')">';
+    html += '<div class="tile-icon">&#127911;</div>';
+    html += '<div class="tile-label">Podcast</div>';
+    html += '<div class="tile-sub">Audio-Zusammenfassung</div></div>';
   }
-
-  /* Quiz */
-  if (tag.quiz && quizData[id]) {
-    html += '<div class="section-title">Quiz (' + quizData[id].length + ' Fragen)</div>';
-    html += '<div class="mode-bar"><span>Modus:</span><div class="mode-toggle">';
-    html += '<button class="mode-btn active" id="modeEach" onclick="setQuizMode(\'each\')">Jede Frage sofort</button>';
-    html += '<button class="mode-btn" id="modeEnd" onclick="setQuizMode(\'end\')">Alle am Ende</button>';
-    html += '</div></div>';
-    html += '<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>';
-    html += '<div class="progress-text" id="progressText">0 / ' + quizData[id].length + ' beantwortet</div>';
-    html += '<div class="sofort-counter" id="sofortCounter"><span class="right" id="cntRight">Richtig: 0</span><span class="wr" id="cntWrong">Falsch: 0</span></div>';
-    html += '<div id="quizArea"></div>';
-    html += '<div class="btn-center">';
-    html += '<button class="btn btn-primary hidden" id="btnEvaluate" onclick="evaluateAll()">Alle auswerten</button>';
-    html += '<button class="btn btn-orange" id="btnReset" onclick="resetQuiz()">Neustart</button>';
-    html += '<button class="btn btn-green" onclick="window.scrollTo({top:0,behavior:\'smooth\'})">Nach oben</button>';
-    html += '</div>';
-    html += '<div class="result-box" id="resultBox"><div class="score-circle" id="scoreCircle">0%</div><h2 id="resultTitle"></h2><p id="resultText"></p><p class="grade" id="resultGrade"></p></div>';
+  if (tag.quiz && quizData[tag.id]) {
+    html += '<div class="tile tile-quiz" onclick="showQuizView(\'' + tag.id + '\')">';
+    html += '<div class="tile-icon">&#9997;&#65039;</div>';
+    html += '<div class="tile-label">Quiz</div>';
+    html += '<div class="tile-sub">' + quizData[tag.id].length + ' Fragen zum \u00DCben</div></div>';
   }
+  html += '</div>';
+  content.innerHTML = html;
+  window.scrollTo({top:0});
+}
 
+function backToTiles() {
+  var tag = null;
+  for (var i = 0; i < tags.length; i++) { if (tags[i].id === currentTagId) { tag = tags[i]; break; } }
+  if (tag) showTagTiles(tag);
+}
+
+/* ========== VIDEO VIEW ========== */
+function showVideo(id) {
+  var content = document.getElementById("tagContent");
+  var html = '<a class="content-back" onclick="backToTiles()">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
+  html += '<div class="section-title">Video</div>';
+  html += '<div class="media-card"><video controls autoplay preload="metadata" style="width:100%;border-radius:8px"><source src="media/' + id + '/video.mp4" type="video/mp4">Dein Browser unterst\u00FCtzt kein Video.</video></div>';
+  content.innerHTML = html;
+  window.scrollTo({top:0});
+}
+
+/* ========== PODCAST VIEW ========== */
+function showPodcast(id) {
+  var content = document.getElementById("tagContent");
+  var html = '<a class="content-back" onclick="backToTiles()">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
+  html += '<div class="section-title">Podcast</div>';
+  html += '<div class="media-card"><audio controls autoplay preload="metadata" style="width:100%;border-radius:8px"><source src="media/' + id + '/podcast.m4a" type="audio/mp4">Dein Browser unterst\u00FCtzt kein Audio.</audio></div>';
+  content.innerHTML = html;
+  window.scrollTo({top:0});
+}
+
+/* ========== QUIZ VIEW ========== */
+function showQuizView(id) {
+  var content = document.getElementById("tagContent");
+  var qData = quizData[id];
+  var html = '<a class="content-back" onclick="backToTiles()">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
+  html += '<div class="section-title">Quiz (' + qData.length + ' Fragen)</div>';
+  html += '<div class="mode-bar"><span>Modus:</span><div class="mode-toggle">';
+  html += '<button class="mode-btn active" id="modeEach" onclick="setQuizMode(\'each\')">Jede Frage sofort</button>';
+  html += '<button class="mode-btn" id="modeEnd" onclick="setQuizMode(\'end\')">Alle am Ende</button>';
+  html += '</div></div>';
+  html += '<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>';
+  html += '<div class="progress-text" id="progressText">0 / ' + qData.length + ' beantwortet</div>';
+  html += '<div class="sofort-counter" id="sofortCounter"><span class="right" id="cntRight">Richtig: 0</span><span class="wr" id="cntWrong">Falsch: 0</span></div>';
+  html += '<div id="quizArea"></div>';
+  html += '<div class="btn-center">';
+  html += '<button class="btn btn-primary hidden" id="btnEvaluate" onclick="evaluateAll()">Alle auswerten</button>';
+  html += '<button class="btn btn-orange" id="btnReset" onclick="resetQuiz()">Neustart</button>';
+  html += '<button class="btn btn-green" onclick="window.scrollTo({top:0,behavior:\'smooth\'})">Nach oben</button>';
+  html += '</div>';
+  html += '<div class="result-box" id="resultBox"><div class="score-circle" id="scoreCircle">0%</div><h2 id="resultTitle"></h2><p id="resultText"></p><p class="grade" id="resultGrade"></p></div>';
   content.innerHTML = html;
   window.scrollTo({top:0});
 
-  if (tag.quiz && quizData[id]) {
-    currentQuiz = quizData[id];
-    quizMode = "each";
-    resetQuizState();
-    renderQuizQuestions();
-  }
+  currentQuiz = qData;
+  quizMode = "each";
+  resetQuizState();
+  renderQuizQuestions();
 }
 
 /* ========== QUIZ ENGINE ========== */
