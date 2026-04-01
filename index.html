@@ -308,7 +308,7 @@ function backToTiles() {
 /* ========== VIDEO VIEW ========== */
 function showVideo(id) {
   var content = document.getElementById("tagContent");
-  var html = '<a class="content-back" onclick="backToTiles()">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
+  var html = '<a class="content-back" href="#" onclick="backToTiles();return false">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
   html += '<div class="section-title">Video</div>';
   html += '<div class="media-card"><video controls autoplay preload="metadata" style="width:100%;border-radius:8px"><source src="media/' + id + '/video.mp4" type="video/mp4">Dein Browser unterst\u00FCtzt kein Video.</video></div>';
   content.innerHTML = html;
@@ -318,7 +318,7 @@ function showVideo(id) {
 /* ========== PODCAST VIEW ========== */
 function showPodcast(id) {
   var content = document.getElementById("tagContent");
-  var html = '<a class="content-back" onclick="backToTiles()">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
+  var html = '<a class="content-back" href="#" onclick="backToTiles();return false">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
   html += '<div class="section-title">Podcast</div>';
   html += '<div class="media-card"><audio controls autoplay preload="metadata" style="width:100%;border-radius:8px"><source src="media/' + id + '/podcast.m4a" type="audio/mp4">Dein Browser unterst\u00FCtzt kein Audio.</audio></div>';
   content.innerHTML = html;
@@ -329,7 +329,7 @@ function showPodcast(id) {
 function showQuizView(id) {
   var content = document.getElementById("tagContent");
   var qData = quizData[id];
-  var html = '<a class="content-back" onclick="backToTiles()">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
+  var html = '<a class="content-back" href="#" onclick="backToTiles();return false">&larr; Zur\u00FCck zur \u00DCbersicht</a>';
   html += '<div class="section-title">Quiz (' + qData.length + ' Fragen)</div>';
   html += '<div class="mode-bar"><span>Modus:</span><div class="mode-toggle">';
   html += '<button class="mode-btn active" id="modeEach" onclick="setQuizMode(\'each\')">Jede Frage sofort</button>';
