@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LF 3 - Kaufvertrag und Beschaffung | KBM TZ</title>
+<style>
+:root{--blue:#0054A6;--darkblue:#003366;--orange:#E87722;--green:#228B22;--light:#DCEBFA;--gray:#646464;--bg:#f4f7fb;--correct:#2e7d32;--wrong:#c62828}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:#222;line-height:1.55;min-height:100vh}
+
+/* ===== LOGIN ===== */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.login-box{background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.12);padding:2.5rem;max-width:420px;width:100%;text-align:center}
+.login-box h1{color:var(--darkblue);font-size:1.5rem;margin-bottom:.3rem}
+.login-box .sub{color:var(--gray);font-size:.9rem;margin-bottom:1.5rem}
+.login-box input{width:100%;padding:.8rem 1rem;border:2px solid #dde3eb;border-radius:8px;font-size:1rem;text-align:center;letter-spacing:2px;transition:border-color .2s}
+.login-box input:focus{outline:none;border-color:var(--blue)}
+.login-box .btn{margin-top:1rem;width:100%}
+.login-error{color:var(--wrong);font-size:.85rem;margin-top:.6rem;min-height:1.2em}
+.login-logo{font-size:3rem;margin-bottom:.5rem}
+
+/* ===== HEADER ===== */
+.app-header{background:linear-gradient(135deg,var(--blue),var(--darkblue));color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.app-header h1{font-size:1.2rem}
+.app-header .logout{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.85rem;transition:background .2s}
+.app-header .logout:hover{background:rgba(255,255,255,.25)}
+.app-header .back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.85rem;transition:background .2s;text-decoration:none}
+.app-header .back-btn:hover{background:rgba(255,255,255,.25)}
+
+/* ===== DASHBOARD ===== */
+.container{max-width:960px;margin:0 auto;padding:1.5rem}
+.dash-title{font-size:1.3rem;color:var(--darkblue);margin-bottom:1rem;font-weight:700}
+.tag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+.tag-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:1.2rem;border-left:5px solid var(--blue);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.tag-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.tag-card.disabled{opacity:.5;cursor:default;border-left-color:#ccc}
+.tag-card.disabled:hover{transform:none;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.tag-card .tag-num{font-weight:800;font-size:1.1rem;color:var(--blue)}
+.tag-card.disabled .tag-num{color:#aaa}
+.tag-card .tag-date{font-size:.85rem;color:var(--gray);margin-top:.15rem}
+.tag-card .tag-topic{font-size:.88rem;margin-top:.5rem;color:#333}
+.tag-card .tag-badges{display:flex;gap:.4rem;margin-top:.6rem;flex-wrap:wrap}
+.tag-badge{font-size:.7rem;padding:2px 8px;border-radius:10px;color:#fff;font-weight:600}
+.tag-badge.quiz{background:var(--blue)}
+.tag-badge.video{background:var(--orange)}
+.tag-badge.podcast{background:var(--green)}
+.tag-badge.soon{background:#ccc;color:#666}
+
+/* ===== TAG VIEW ===== */
+.tag-view{display:none}
+.tag-header{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:1.5rem;margin-bottom:1.2rem;border-left:5px solid var(--blue)}
+.tag-header h2{color:var(--darkblue);font-size:1.3rem}
+.tag-header p{color:var(--gray);font-size:.9rem;margin-top:.2rem}
+.section-title{font-size:1.1rem;font-weight:700;color:var(--darkblue);margin:1.5rem 0 .8rem;padding-bottom:.3rem;border-bottom:2px solid var(--blue)}
+.media-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:1.2rem;margin-bottom:1.2rem}
+.media-card video,.media-card audio{width:100%;border-radius:8px;margin-top:.5rem}
+
+/* ===== QUIZ INSIDE TAG ===== */
+.mode-bar{background:#fff;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,.07);display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.mode-bar span{font-weight:600;color:var(--darkblue)}
+.mode-toggle{display:flex;border-radius:8px;overflow:hidden;border:2px solid var(--blue)}
+.mode-btn{padding:.45rem 1rem;border:none;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s;background:#fff;color:var(--blue)}
+.mode-btn.active{background:var(--blue);color:#fff}
+.mode-btn:hover:not(.active){background:var(--light)}
+.progress-bar-wrap{background:#ddd;border-radius:8px;height:12px;margin:.5rem 0;overflow:hidden}
+.progress-bar{height:100%;width:0%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--orange));transition:width .4s}
+.progress-text{font-size:.82rem;color:var(--gray);text-align:right;margin-bottom:.5rem}
+.question-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-bottom:1rem;padding:1.2rem;border-left:5px solid var(--blue);transition:border-color .3s}
+.question-card.answered-correct{border-left-color:var(--correct)}
+.question-card.answered-wrong{border-left-color:var(--wrong)}
+.q-header{display:flex;align-items:center;flex-wrap:wrap;gap:.3rem}
+.q-number{display:inline-flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;border-radius:50%;width:30px;height:30px;font-weight:700;font-size:.8rem;flex-shrink:0}
+.q-text{font-weight:600;font-size:.95rem;margin-left:.4rem}
+.cat-badge{display:inline-block;font-size:.68rem;padding:2px 7px;border-radius:10px;color:#fff;font-weight:600;margin-left:.3rem;white-space:nowrap}
+.cat-eva{background:var(--blue)}.cat-netz{background:var(--orange)}.cat-drucker{background:var(--green)}
+.options{margin-top:.7rem;display:flex;flex-direction:column;gap:.4rem}
+.option-label{display:flex;align-items:flex-start;gap:.5rem;padding:.55rem .8rem;border:2px solid #dde3eb;border-radius:8px;cursor:pointer;transition:background .2s,border-color .2s;font-size:.9rem}
+.option-label:hover{background:var(--light);border-color:var(--blue)}
+.option-label input[type="radio"]{margin-top:3px;accent-color:var(--blue);cursor:pointer}
+.option-label.selected{background:var(--light);border-color:var(--blue);font-weight:600}
+.option-label.correct-answer{background:#e8f5e9!important;border-color:var(--correct)!important}
+.option-label.wrong-answer{background:#ffebee!important;border-color:var(--wrong)!important}
+.option-label.locked{pointer-events:none;cursor:default}
+.explanation{margin-top:.7rem;padding:.7rem .9rem;border-radius:8px;font-size:.85rem;display:none}
+.explanation.show{display:block}
+.explanation.correct-expl{background:#e8f5e9;border-left:4px solid var(--correct)}
+.explanation.wrong-expl{background:#ffebee;border-left:4px solid var(--wrong)}
+.explanation b{color:var(--correct)}
+.explanation.wrong-expl b{color:var(--wrong)}
+.sofort-counter{background:#fff;border-radius:10px;padding:.7rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.07);display:flex;justify-content:center;gap:2rem;margin-bottom:.8rem;font-weight:600;font-size:.9rem}
+.sofort-counter .right{color:var(--correct)}.sofort-counter .wr{color:var(--wrong)}
+.btn{display:inline-block;padding:.65rem 1.5rem;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s;color:#fff}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--darkblue))}
+.btn-orange{background:linear-gradient(135deg,var(--orange),#d4691a)}
+.btn-green{background:linear-gradient(135deg,var(--green),#1a6e1a)}
+.btn-center{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin:1.2rem 0}
+.result-box{text-align:center;padding:1.5rem;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin:1.2rem 0;display:none}
+.result-box.show{display:block}
+.score-circle{width:120px;height:120px;border-radius:50%;margin:0 auto .8rem;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff}
+.score-good{background:linear-gradient(135deg,var(--green),#1a6e1a)}
+.score-medium{background:linear-gradient(135deg,var(--orange),#d4691a)}
+.score-bad{background:linear-gradient(135deg,var(--wrong),#a11a1a)}
+.result-box h2{font-size:1.2rem;margin-bottom:.4rem;color:var(--darkblue)}
+.result-box p{color:var(--gray);font-size:.9rem}
+.grade{font-size:1.05rem;font-weight:700;margin-top:.4rem}
+footer{text-align:center;padding:1.2rem;color:var(--gray);font-size:.75rem}
+.hidden{display:none!important}
+@media(max-width:600px){.tag-grid{grid-template-columns:1fr}.app-header h1{font-size:1rem}.login-box{padding:1.5rem}}
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">&#128218;</div>
+    <h1>LF 3 &ndash; Kaufvertrag &amp; Beschaffung</h1>
+    <p class="sub">KBM TZ &middot; US10-2601-1</p>
+    <input type="password" id="codeInput" placeholder="Zugangscode eingeben" autocomplete="off">
+    <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="tryLogin()">Einloggen</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboardScreen" class="hidden">
+  <div class="app-header">
+    <h1>&#128218; LF 3 &ndash; Kaufvertrag &amp; Beschaffung</h1>
+    <button class="logout" onclick="logout()">Abmelden</button>
+  </div>
+  <div class="container">
+    <p class="dash-title">Unterrichtstage</p>
+    <div class="tag-grid" id="tagGrid"></div>
+  </div>
+  <footer>&copy; Can Siebert | KBM TZ US10-2601-1</footer>
+</div>
+
+<!-- ==================== TAG VIEW ==================== -->
+<div id="tagViewScreen" class="hidden">
+  <div class="app-header">
+    <div style="display:flex;align-items:center;gap:.8rem">
+      <a class="back-btn" href="#" onclick="showDashboard();return false">&larr; Alle Tage</a>
+      <h1 id="tagViewTitle"></h1>
+    </div>
+    <button class="logout" onclick="logout()">Abmelden</button>
+  </div>
+  <div class="container">
+    <div class="tag-header">
+      <h2 id="tagViewHeading"></h2>
+      <p id="tagViewSub"></p>
+    </div>
+    <div id="tagContent"></div>
+  </div>
+  <footer>&copy; Can Siebert | KBM TZ US10-2601-1</footer>
+</div>
+
+<!-- Quiz data -->
+<script src="data/tag01.js"></script>
+
+<script>
+/* ========== TAG CONFIG ========== */
+var tags = [
+  {id:"tag01",num:"Tag 01",date:"Mi 01.04.2026",topic:"EVA-Prinzip, Computernetzwerke, Drucker",quiz:true,video:true,podcast:true},
+  {id:"tag02",num:"Tag 02",date:"Di 07.04.2026",topic:"Software, Betriebssysteme, Anwendungsprogramme",quiz:false,video:false,podcast:false},
+  {id:"tag03",num:"Tag 03",date:"Mi 08.04.2026",topic:"Ergonomie am Arbeitsplatz",quiz:false,video:false,podcast:false},
+  {id:"tag04",num:"Tag 04",date:"Di 14.04.2026",topic:"Datenschutz und Datensicherheit",quiz:false,video:false,podcast:false},
+  {id:"tag05",num:"Tag 05",date:"Mi 15.04.2026",topic:"Kaufvertrag: Grundlagen",quiz:false,video:false,podcast:false},
+  {id:"tag06",num:"Tag 06",date:"Di 21.04.2026",topic:"Kaufvertrag: Rechte und Pflichten",quiz:false,video:false,podcast:false},
+  {id:"tag07",num:"Tag 07",date:"Mi 22.04.2026",topic:"Kaufvertrag: Angebot und Nachfrage",quiz:false,video:false,podcast:false},
+  {id:"tag08",num:"Tag 08",date:"Di 28.04.2026",topic:"Beschaffung: Bedarfsermittlung",quiz:false,video:false,podcast:false},
+  {id:"tag09",num:"Tag 09",date:"Mi 29.04.2026",topic:"Beschaffung: Angebotsvergleich",quiz:false,video:false,podcast:false},
+  {id:"tag10",num:"Tag 10",date:"Di 05.05.2026",topic:"Beschaffung: Bestellung und Lieferung",quiz:false,video:false,podcast:false},
+  {id:"tag11",num:"Tag 11",date:"Mi 06.05.2026",topic:"Beschaffung: Rechnungspr\u00FCfung",quiz:false,video:false,podcast:false},
+  {id:"tag12",num:"Tag 12",date:"Di 12.05.2026",topic:"Kaufvertragst\u00F6rungen: \u00DCberblick",quiz:false,video:false,podcast:false},
+  {id:"tag13",num:"Tag 13",date:"Mi 13.05.2026",topic:"Kaufvertragst\u00F6rungen: Schlechtleistung",quiz:false,video:false,podcast:false},
+  {id:"tag14",num:"Tag 14",date:"Di 19.05.2026",topic:"Kaufvertragst\u00F6rungen: Lieferverzug",quiz:false,video:false,podcast:false},
+  {id:"tag15",num:"Tag 15",date:"Mi 20.05.2026",topic:"Kaufvertragst\u00F6rungen: Zahlungsverzug",quiz:false,video:false,podcast:false},
+  {id:"tag16",num:"Tag 16",date:"Di 26.05.2026",topic:"Verbraucherschutz und AGB",quiz:false,video:false,podcast:false},
+  {id:"tag17",num:"Tag 17",date:"Mi 27.05.2026",topic:"Wiederholung und Pr\u00FCfungsvorbereitung",quiz:false,video:false,podcast:false},
+  {id:"tag18",num:"Tag 18",date:"Di 02.06.2026",topic:"Pr\u00FCfungssimulation",quiz:false,video:false,podcast:false}
+];
+
+var ACCESS_CODE = "KBM-tz_2601";
+
+/* ========== LOGIN ========== */
+function tryLogin() {
+  var code = document.getElementById("codeInput").value.trim();
+  if (code === ACCESS_CODE) {
+    sessionStorage.setItem("lf3_auth", "1");
+    document.getElementById("loginError").textContent = "";
+    showDashboard();
+  } else {
+    document.getElementById("loginError").textContent = "Falscher Zugangscode.";
+    document.getElementById("codeInput").value = "";
+    document.getElementById("codeInput").focus();
+  }
+}
+document.getElementById("codeInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") tryLogin();
+});
+
+function logout() {
+  sessionStorage.removeItem("lf3_auth");
+  showLogin();
+}
+
+function showLogin() {
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("dashboardScreen").classList.add("hidden");
+  document.getElementById("tagViewScreen").classList.add("hidden");
+  document.getElementById("codeInput").value = "";
+}
+
+/* ========== DASHBOARD ========== */
+function showDashboard() {
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("dashboardScreen").classList.remove("hidden");
+  document.getElementById("tagViewScreen").classList.add("hidden");
+  renderDashboard();
+  window.scrollTo({top:0});
+}
+
+function renderDashboard() {
+  var grid = document.getElementById("tagGrid");
+  var html = "";
+  for (var i = 0; i < tags.length; i++) {
+    var t = tags[i];
+    var hasContent = t.quiz || t.video || t.podcast;
+    html += '<div class="tag-card' + (hasContent ? '' : ' disabled') + '" ' + (hasContent ? 'onclick="openTag(\'' + t.id + '\')"' : '') + '>';
+    html += '<div class="tag-num">' + t.num + '</div>';
+    html += '<div class="tag-date">' + t.date + '</div>';
+    html += '<div class="tag-topic">' + t.topic + '</div>';
+    html += '<div class="tag-badges">';
+    if (t.quiz) html += '<span class="tag-badge quiz">Quiz</span>';
+    if (t.video) html += '<span class="tag-badge video">Video</span>';
+    if (t.podcast) html += '<span class="tag-badge podcast">Podcast</span>';
+    if (!hasContent) html += '<span class="tag-badge soon">Noch nicht verf\u00FCgbar</span>';
+    html += '</div></div>';
+  }
+  grid.innerHTML = html;
+}
+
+/* ========== TAG VIEW ========== */
+function openTag(id) {
+  var tag = null;
+  for (var i = 0; i < tags.length; i++) { if (tags[i].id === id) { tag = tags[i]; break; } }
+  if (!tag) return;
+
+  document.getElementById("dashboardScreen").classList.add("hidden");
+  document.getElementById("tagViewScreen").classList.remove("hidden");
+  document.getElementById("tagViewTitle").textContent = tag.num;
+  document.getElementById("tagViewHeading").textContent = tag.num + " \u2013 " + tag.topic;
+  document.getElementById("tagViewSub").textContent = tag.date;
+
+  var content = document.getElementById("tagContent");
+  var html = "";
+
+  /* Video */
+  if (tag.video) {
+    html += '<div class="section-title">Video</div>';
+    html += '<div class="media-card"><video controls preload="metadata"><source src="media/' + id + '/video.mp4" type="video/mp4">Dein Browser unterst\u00FCtzt kein Video.</video></div>';
+  }
+
+  /* Podcast */
+  if (tag.podcast) {
+    html += '<div class="section-title">Podcast</div>';
+    html += '<div class="media-card"><audio controls preload="metadata"><source src="media/' + id + '/podcast.m4a" type="audio/mp4">Dein Browser unterst\u00FCtzt kein Audio.</audio></div>';
+  }
+
+  /* Quiz */
+  if (tag.quiz && quizData[id]) {
+    html += '<div class="section-title">Quiz (' + quizData[id].length + ' Fragen)</div>';
+    html += '<div class="mode-bar"><span>Modus:</span><div class="mode-toggle">';
+    html += '<button class="mode-btn active" id="modeEach" onclick="setQuizMode(\'each\')">Jede Frage sofort</button>';
+    html += '<button class="mode-btn" id="modeEnd" onclick="setQuizMode(\'end\')">Alle am Ende</button>';
+    html += '</div></div>';
+    html += '<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>';
+    html += '<div class="progress-text" id="progressText">0 / ' + quizData[id].length + ' beantwortet</div>';
+    html += '<div class="sofort-counter" id="sofortCounter"><span class="right" id="cntRight">Richtig: 0</span><span class="wr" id="cntWrong">Falsch: 0</span></div>';
+    html += '<div id="quizArea"></div>';
+    html += '<div class="btn-center">';
+    html += '<button class="btn btn-primary hidden" id="btnEvaluate" onclick="evaluateAll()">Alle auswerten</button>';
+    html += '<button class="btn btn-orange" id="btnReset" onclick="resetQuiz()">Neustart</button>';
+    html += '<button class="btn btn-green" onclick="window.scrollTo({top:0,behavior:\'smooth\'})">Nach oben</button>';
+    html += '</div>';
+    html += '<div class="result-box" id="resultBox"><div class="score-circle" id="scoreCircle">0%</div><h2 id="resultTitle"></h2><p id="resultText"></p><p class="grade" id="resultGrade"></p></div>';
+  }
+
+  content.innerHTML = html;
+  window.scrollTo({top:0});
+
+  if (tag.quiz && quizData[id]) {
+    currentQuiz = quizData[id];
+    quizMode = "each";
+    resetQuizState();
+    renderQuizQuestions();
+  }
+}
+
+/* ========== QUIZ ENGINE ========== */
+var currentQuiz = [];
+var quizMode = "each";
+var quizAnswered = {};
+var quizCorrectCount = 0;
+var quizWrongCount = 0;
+
+function setQuizMode(m) {
+  quizMode = m;
+  document.getElementById("modeEach").className = "mode-btn" + (m === "each" ? " active" : "");
+  document.getElementById("modeEnd").className = "mode-btn" + (m === "end" ? " active" : "");
+  document.getElementById("btnEvaluate").classList.toggle("hidden", m === "each");
+  document.getElementById("sofortCounter").style.display = (m === "each") ? "flex" : "none";
+  resetQuizState();
+  renderQuizQuestions();
+}
+
+function resetQuizState() {
+  quizAnswered = {};
+  quizCorrectCount = 0;
+  quizWrongCount = 0;
+  var cr = document.getElementById("cntRight"); if(cr) cr.textContent = "Richtig: 0";
+  var cw = document.getElementById("cntWrong"); if(cw) cw.textContent = "Falsch: 0";
+  var pb = document.getElementById("progressBar"); if(pb) pb.style.width = "0%";
+  var pt = document.getElementById("progressText"); if(pt) pt.textContent = "0 / " + currentQuiz.length + " beantwortet";
+  var rb = document.getElementById("resultBox"); if(rb) rb.classList.remove("show");
+  var be = document.getElementById("btnEvaluate"); if(be && quizMode === "end") be.classList.remove("hidden");
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function renderQuizQuestions() {
+  var html = "";
+  for (var i = 0; i < currentQuiz.length; i++) {
+    var item = currentQuiz[i];
+    var catClass = item.cat === "eva" ? "cat-eva" : item.cat === "netz" ? "cat-netz" : "cat-drucker";
+    var catLabel = item.cat === "eva" ? "EVA / Hardware" : item.cat === "netz" ? "Netzwerke" : "Drucker / Kopierer";
+    var order = shuffle([0,1,2,3]);
+
+    html += '<div class="question-card" id="qcard-' + i + '">';
+    html += '<div class="q-header"><span class="q-number">' + (i+1) + '</span>';
+    html += '<span class="q-text">' + item.q + '</span>';
+    html += '<span class="cat-badge ' + catClass + '">' + catLabel + '</span></div>';
+    html += '<div class="options" id="opts-' + i + '">';
+    for (var j = 0; j < order.length; j++) {
+      var oi = order[j];
+      html += '<label class="option-label" id="opt-' + i + '-' + j + '" data-q="' + i + '" data-o="' + oi + '">';
+      html += '<input type="radio" name="q' + i + '" value="' + oi + '"> ' + item.o[oi];
+      html += '</label>';
+    }
+    html += '</div>';
+    html += '<div class="explanation" id="expl-' + i + '"></div></div>';
+  }
+  document.getElementById("quizArea").innerHTML = html;
+
+  var allLabels = document.querySelectorAll("#quizArea .option-label");
+  for (var k = 0; k < allLabels.length; k++) {
+    allLabels[k].addEventListener("click", handleQuizClick);
+  }
+}
+
+function handleQuizClick(evt) {
+  var label = evt.currentTarget;
+  var qIdx = parseInt(label.getAttribute("data-q"));
+  var oIdx = parseInt(label.getAttribute("data-o"));
+  if (quizMode === "each" && quizAnswered[qIdx] !== undefined) return;
+
+  var radio = label.querySelector("input");
+  radio.checked = true;
+  var siblings = document.querySelectorAll('#opts-' + qIdx + ' .option-label');
+  for (var s = 0; s < siblings.length; s++) siblings[s].classList.remove("selected");
+  label.classList.add("selected");
+
+  if (quizMode === "each") {
+    quizAnswered[qIdx] = oIdx;
+    evalSingle(qIdx, oIdx);
+  } else {
+    if (quizAnswered[qIdx] === undefined) { quizAnswered[qIdx] = oIdx; updateQuizProgress(); }
+    quizAnswered[qIdx] = oIdx;
+  }
+}
+
+function findQLbl(qIdx, origIdx) {
+  var labels = document.querySelectorAll('#opts-' + qIdx + ' .option-label');
+  for (var i = 0; i < labels.length; i++) {
+    if (parseInt(labels[i].getAttribute("data-o")) === origIdx) return labels[i];
+  }
+  return null;
+}
+
+function evalSingle(qIdx, selected) {
+  var item = currentQuiz[qIdx];
+  var card = document.getElementById("qcard-" + qIdx);
+  var expl = document.getElementById("expl-" + qIdx);
+  var opts = document.querySelectorAll('#opts-' + qIdx + ' .option-label');
+  for (var j = 0; j < opts.length; j++) opts[j].classList.add("locked");
+  findQLbl(qIdx, item.c).classList.add("correct-answer");
+
+  if (selected === item.c) {
+    quizCorrectCount++;
+    card.classList.add("answered-correct");
+    expl.className = "explanation show correct-expl";
+    expl.innerHTML = "<b>Richtig!</b> " + item.e;
+  } else {
+    quizWrongCount++;
+    findQLbl(qIdx, selected).classList.add("wrong-answer");
+    card.classList.add("answered-wrong");
+    expl.className = "explanation show wrong-expl";
+    expl.innerHTML = "<b>Falsch!</b> " + item.e;
+  }
+  document.getElementById("cntRight").textContent = "Richtig: " + quizCorrectCount;
+  document.getElementById("cntWrong").textContent = "Falsch: " + quizWrongCount;
+  updateQuizProgress();
+  if (quizCorrectCount + quizWrongCount === currentQuiz.length) showQuizResult(quizCorrectCount, 0);
+}
+
+function evaluateAll() {
+  var correct = 0, unanswered = 0;
+  for (var i = 0; i < currentQuiz.length; i++) {
+    var item = currentQuiz[i];
+    var card = document.getElementById("qcard-" + i);
+    var expl = document.getElementById("expl-" + i);
+    var opts = document.querySelectorAll('#opts-' + i + ' .option-label');
+    for (var j = 0; j < opts.length; j++) opts[j].classList.add("locked");
+    findQLbl(i, item.c).classList.add("correct-answer");
+    var sel = document.querySelector('input[name="q' + i + '"]:checked');
+    if (!sel) {
+      unanswered++;
+      card.classList.add("answered-wrong");
+      expl.className = "explanation show wrong-expl";
+      expl.innerHTML = "<b>Nicht beantwortet!</b> " + item.e;
+    } else {
+      var val = parseInt(sel.value);
+      if (val === item.c) { correct++; card.classList.add("answered-correct"); expl.className = "explanation show correct-expl"; expl.innerHTML = "<b>Richtig!</b> " + item.e; }
+      else { findQLbl(i, val).classList.add("wrong-answer"); card.classList.add("answered-wrong"); expl.className = "explanation show wrong-expl"; expl.innerHTML = "<b>Falsch!</b> " + item.e; }
+    }
+  }
+  showQuizResult(correct, unanswered);
+  document.getElementById("btnEvaluate").classList.add("hidden");
+}
+
+function showQuizResult(correct, unanswered) {
+  var pct = Math.round((correct / currentQuiz.length) * 100);
+  var sc = document.getElementById("scoreCircle");
+  sc.textContent = pct + "%";
+  sc.className = "score-circle " + (pct >= 70 ? "score-good" : pct >= 50 ? "score-medium" : "score-bad");
+  var title, grade;
+  if (pct >= 90) { title = "Hervorragend!"; grade = "Note: 1"; }
+  else if (pct >= 80) { title = "Sehr gut!"; grade = "Note: 2"; }
+  else if (pct >= 70) { title = "Gut!"; grade = "Note: 3"; }
+  else if (pct >= 50) { title = "Ausreichend"; grade = "Note: 4"; }
+  else if (pct >= 30) { title = "Mangelhaft"; grade = "Note: 5"; }
+  else { title = "Ungen\u00FCgend"; grade = "Note: 6"; }
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultText").textContent = correct + " von " + currentQuiz.length + " richtig" + (unanswered > 0 ? " (" + unanswered + " offen)" : "");
+  document.getElementById("resultGrade").textContent = grade;
+  document.getElementById("resultBox").classList.add("show");
+  document.getElementById("resultBox").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+function updateQuizProgress() {
+  var count = 0;
+  for (var k in quizAnswered) { if (quizAnswered.hasOwnProperty(k)) count++; }
+  var pct = Math.round((count / currentQuiz.length) * 100);
+  document.getElementById("progressBar").style.width = pct + "%";
+  document.getElementById("progressText").textContent = count + " / " + currentQuiz.length + " beantwortet";
+}
+
+function resetQuiz() {
+  resetQuizState();
+  renderQuizQuestions();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ========== INIT ========== */
+if (sessionStorage.getItem("lf3_auth") === "1") { showDashboard(); } else { showLogin(); }
+</script>
+</body>
+</html>
